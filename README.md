@@ -122,6 +122,11 @@ The container is setup by setting [environment variables](https://docs.docker.co
 * `AWS_SECRET_ACCESS_KEY` - Optional. When using restic with AWS S3 storage.
 * `TEAMS_WEBHOOK_URL` - Optional. If specified, the content of `/var/log/backup-last.log` is sent to your Microsoft Teams channel after each backup.
 * `MAILX_ARGS` - Optional. If specified, the content of `/var/log/backup-last.log` is sent via mail after each backup using an *external SMTP*. To have maximum flexibility, you have to specify the mail/smtp parameters by your own. Have a look at the [mailx manpage](https://linux.die.net/man/1/mailx) for further information. Example value: `-e "MAILX_ARGS=-r 'from@example.de' -s 'Result of the last restic backup run' -S smtp='smtp.example.com:587' -S smtp-use-starttls -S smtp-auth=login -S smtp-auth-user='username' -S smtp-auth-password='password' 'to@example.com'"`.
+* `MQTT_HOST` - Optional. Set to sent an MQTT message when the backup completes.
+* `MQTT_PORT` - Optional. When using MQTT, override the default port (`1883`).
+* `MQTT_TOPIC` - Optional. When using MQTT, override the default topic (`backups.restic`).
+* `MQTT_USERNAME` - Optional. When using MQTT with authentication, set a username.
+* `MQTT_PASSWORD` - Optional. When using MQTT with authentication, set a password.
 * `OS_AUTH_URL` - Optional. When using restic with OpenStack Swift container.
 * `OS_PROJECT_ID` - Optional. When using restic with OpenStack Swift container.
 * `OS_PROJECT_NAME` - Optional. When using restic with OpenStack Swift container.

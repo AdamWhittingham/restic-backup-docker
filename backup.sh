@@ -3,6 +3,7 @@
 lastLogfile="/var/log/backup-last.log"
 lastMailLogfile="/var/log/mail-last.log"
 lastMicrosoftTeamsLogfile="/var/log/microsoft-teams-last.log"
+lastMqttLogfile="/var/log/mqtt.log"
 
 copyErrorLog() {
   cp ${lastLogfile} /var/log/backup-error-last.log
@@ -58,6 +59,27 @@ fi
 
 end=`date +%s`
 echo "Finished Backup at $(date +"%Y-%m-%d %H:%M:%S") after $((end-start)) seconds"
+
+if [ -n "${MQTT_HOST}" ]; then
+    MQTT_ARGS="-h ${MQTT_HOST}"
+    if [ -n "${MQTT_PORT}" ]; then MQTT_ARGS="${MQTT_ARGS} -p ${MQTT_PORT}"; fi
+    if [ -n "${MQTT_USERNAME}" ]; then MQTT_ARGS="${MQTT_ARGS} -u ${MQTT_USERNAME}"; fi
+    if [ -n "${MQTT_PASSWORD}" ]; then MQTT_ARGS="${MQTT_ARGS} -P ${MQTT_PASSWORD}"; fi
+    if [ -n "${MQTT_TOPIC}" ]; then
+        MQTT_ARGS="${MQTT_ARGS} -t ${MQTT_PASSWORD}"
+    else
+        MQTT_ARGS="${MQTT_ARGS} -t backups.restic"
+    fi
+
+    payload=" { \"repository\": \"${RESTIC_REPOSITORY}\", \"end_time\": \"$end\" }"
+
+    mosquitto_pub $MQTT_ARGS -m "$payload"
+    if [ $? == 0 ]; then
+        echo "MQTT notification successfully sent."
+    else
+        echo "MQTT notification FAILED. Check ${lastMqttLogfile} for further information."
+    fi
+fi
 
 if [ -n "${TEAMS_WEBHOOK_URL}" ]; then
     teamsTitle="Restic Last Backup Log"
